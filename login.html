@@ -51,7 +51,7 @@
         function authDiscord() {
             // TWOJE DANE KLIENTA
             const clientID = "1483983829919076432";
-            const redirect = encodeURIComponent("http://127.0.0.1:5500/index.html");
+            const redirect = encodeURIComponent("https://discord.com/oauth2/authorize?client_id=1483983829919076432&response_type=code&redirect_uri=https%3A%2F%2Fkubushime.github.io%2Ftescikxd%2F&scope=identify");
             
             // Przekierowanie do Discorda
             window.location.href = `https://discord.com/oauth2/authorize?client_id=${clientID}&response_type=token&redirect_uri=${redirect}&scope=identify`;
