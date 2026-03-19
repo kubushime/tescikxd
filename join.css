@@ -1,0 +1,175 @@
+/* --- ZMIENNE GŁÓWNE (Upewnij się, że są też w global.css) --- */
+:root {
+    --primary-green: #2ecc71;
+    --bg-dark: #0a0a0a;
+    --soft-green: #a2b9ad;
+    --accent-glow: rgba(46, 204, 113, 0.4);
+}
+
+/* --- KONTENER GŁÓWNY --- */
+.join-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 120px 20px 80px;
+    background: radial-gradient(circle at center, rgba(46, 204, 113, 0.03) 0%, var(--bg-dark) 80%);
+}
+
+.form-box {
+    max-width: 850px;
+    width: 100%;
+    text-align: center;
+}
+
+/* --- NAGŁÓWKI --- */
+.badge {
+    background: rgba(46, 204, 113, 0.1);
+    color: var(--primary-green);
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border: 1px solid var(--primary-green);
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-box h1 {
+    font-size: clamp(2.5rem, 8vw, 3.5rem);
+    margin-bottom: 10px;
+    font-weight: 900;
+}
+
+.form-box h1 span {
+    color: var(--primary-green);
+    text-shadow: 0 0 30px var(--accent-glow);
+}
+
+.form-intro {
+    color: var(--soft-green);
+    margin-bottom: 40px;
+    font-size: 1.1rem;
+}
+
+/* --- FORMULARZ --- */
+.cgl-form {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 40px;
+    border-radius: 15px;
+    text-align: left;
+    backdrop-filter: blur(10px);
+}
+
+.form-section {
+    margin-bottom: 35px;
+}
+
+.form-section h3 {
+    color: var(--primary-green);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(46, 204, 113, 0.2);
+    padding-bottom: 8px;
+    font-weight: 700;
+}
+
+/* --- GRID DLA SKŁADU --- */
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+@media (max-width: 650px) {
+    .input-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- POLA INPUT --- */
+input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 14px 18px;
+    color: white;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    background: rgba(46, 204, 113, 0.05);
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.1);
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- PRZYCISK WYSYŁANIA --- */
+.btn-main {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--primary-green);
+    color: #000;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-main:hover {
+    background: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.5);
+}
+
+.btn-main:active {
+    transform: translateY(-1px);
+}
+
+.btn-main:disabled {
+    background: #222 !important;
+    color: #555 !important;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* --- DOPISKI --- */
+.form-note {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--soft-green);
+    margin-top: 25px;
+    opacity: 0.7;
+}
+
+/* Styl sukcesu po wysłaniu */
+.success-state {
+    background: #27ae60 !important;
+    color: white !important;
+}
+.my-swal-popup {
+    border: 1px solid #00ff88 !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    border-radius: 15px !important;
+    font-family: 'Inter', sans-serif !important;
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common Ground | CS2 League</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <img src="logoliga.jpg" alt="Logo CGL" class="nav-logo">
+        <ul class="nav-links">
+            <li><a href="index.html">Start</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="teams.html">Drużyny</a></li>
+            <li><a href="my-team.html">Mój zespół</a></li>
+            <li><a href="login.html" class="nav-btn login-special">Zaloguj się</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Find Your <span>Common Ground</span></h1>
+            <p>Amatorska LIGA z dużymi ambicjami.</p>
+            <div class="cta-buttons">
+                <a href="login.html" class="btn-main">Dołącz do Sezonu 1</a>
+                <a href="rules.html" class="btn-secondary">Poznaj zasady</a>
+            </div>
+        </div>
+    </header>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+    const fragment = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = fragment.get('access_token');
+
+    if (accessToken) {
+        // Czyścimy URL z tokena dla bezpieczeństwa
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        try {
+            // Pobieramy dane o użytkowniku z API Discorda
+            const response = await fetch('https://discord.com/api/users/@me', {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            const userData = await response.json();
+
+            if (userData.id) {
+                // Zapisujemy użytkownika w pamięci przeglądarki
+                localStorage.setItem('cgl_user', JSON.stringify({
+                    id: userData.id,
+                    username: userData.username,
+                    avatar: userData.avatar,
+                    discriminator: userData.discriminator
+                }));
+
+                // Przekierowujemy do dashboardu
+                window.location.href = 'dashboard.html';
+            }
+        } catch (error) {
+            console.error('Błąd pobierania danych z Discord:', error);
+            window.location.href = 'login.html?error=fetch_failed';
+        }
+    }
+});
+    // 1. OBSŁUGA LOGOWANIA (TOKEN Z URL)
+    window.onload = () => {
+        const fragment = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = fragment.get('access_token');
+
+        if (accessToken) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            fetch('https://discord.com/api/users/@me', {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            })
+            .then(res => res.json())
+            .then(user => {
+                localStorage.setItem('cgl_user', JSON.stringify(user));
+                location.reload(); // Odświeżamy, żeby skrypt poniżej zaktualizował UI
+            })
+            .catch(err => console.error("Błąd logowania:", err));
+        }
+    };
+
+    // 2. AKTUALIZACJA INTERFEJSU DLA ZALOGOWANEGO
+    document.addEventListener('DOMContentLoaded', () => {
+        const user = JSON.parse(localStorage.getItem('cgl_user'));
+        const loginBtn = document.querySelector('.login-special');
+        const heroBtn = document.querySelector('.btn-main');
+
+        if (user) {
+            // Podmiana przycisku w Menu na pigułkę profilu
+            if (loginBtn) {
+                const avatarUrl = user.avatar 
+                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                    : 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+                loginBtn.parentElement.innerHTML = `
+                    <div class="user-pill" onclick="window.location.href='dashboard.html'" style="cursor:pointer">
+                        <img src="${avatarUrl}" class="user-avatar" style="width:30px; border-radius:50%; margin-right:10px;">
+                        <span class="user-nick" style="font-weight:bold">${user.username}</span>
+                    </div>
+                `;
+            }
+
+            // Podmiana przycisku "Dołącz" w Hero na "Panel"
+            if (heroBtn) {
+                heroBtn.innerText = "Przejdź do Panelu";
+                heroBtn.href = "dashboard.html";
+            }
+        }
+    });
+    </script>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Common Ground</h4>
+                <p>Chcemy być największą amatorską ligą w Polsce.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Społeczność</h4>
+                <div class="social-icons">
+                    <a href="https://discord.gg/bw7rSeSnJS" class="social-btn discord-footer">DISCORD</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Common Ground League. Wszystkie prawa zastrzeżone.
+        </div>
+    </footer>
+</body>
+</html>

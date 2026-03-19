@@ -1,0 +1,92 @@
+/* --- SEKCJA HERO (Strona Główna) --- */
+.hero {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, rgba(46, 204, 113, 0.05) 0%, var(--bg-dark) 70%);
+    text-align: center;
+    padding: 0 20px;
+}
+
+.hero-content {
+    max-width: 800px;
+}
+
+.hero h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem); /* Elastyczna wielkość czcionki */
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+    line-height: 1.1;
+}
+
+.hero h1 span {
+    color: var(--primary-green);
+    text-shadow: 0 0 30px var(--accent-glow);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: var(--soft-green);
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- PRZYCISKI --- */
+.cta-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap; /* Żeby na telefonach przyciski były jeden pod drugim */
+}
+
+.btn-main {
+    background: var(--primary-green);
+    color: var(--bg-dark);
+    padding: 16px 35px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    border: 2px solid var(--primary-green);
+}
+
+.btn-main:hover {
+    background: var(--deep-green);
+    border-color: var(--deep-green);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(46, 204, 113, 0.2);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-white);
+    padding: 16px 35px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+    background: rgba(46, 204, 113, 0.05);
+}
+
+/* Responsywność dla telefonów */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.8rem;
+    }
+    
+    .nav-links {
+        display: none; /* Ukrywamy menu na mobile (można potem dorobić burger menu) */
+    }
+}

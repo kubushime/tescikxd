@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uczestnicy Sezonu 1 | Common Ground</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="teams2.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <img src="logoliga.jpg" alt="Logo CGL" class="nav-logo">
+        <ul class="nav-links">
+            <li><a href="index.html">Start</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="teams2.html">Drużyny</a></li>
+            <li id="auth-nav-item"><a href="login.html" class="nav-btn">Zaloguj się</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <section class="content-section">
+            <h2 class="badge">STATUS: TRWAJĄ ZAPISY</h2>
+            <h1>Lista <span>Uczestników</span></h1>
+            
+            <div id="teams-grid" class="teams-grid">
+                <p class="loading-msg" style="text-align: center; color: #777; width: 100%;">Pobieranie listy zweryfikowanych drużyn...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Common Ground</h4>
+                <p>Chcemy być największą amatorską lub i nie ligą w Polsce</p>
+            </div>
+            <div class="footer-section">
+                <h4>Społeczność</h4>
+                <div class="social-icons">
+                    <a href="https://discord.gg/bw7rSeSnJS" class="social-btn discord-footer">DISCORD</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Common Ground League. Wszystkie prawa zastrzeżone.
+        </div>
+    </footer>
+
+    <script>
+    // TWOJA KONFIGURACJA
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwSZhOFVvA0Dq4dZLpfR6bTisjj8mZfxF5-vCiQvSqCW_caJVWzHhsoxBWafKvfunuNIA/exec?action=getAll';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. LOGIKA PROFILU W MENU
+        const user = JSON.parse(localStorage.getItem('cgl_user'));
+        const authItem = document.getElementById('auth-nav-item');
+
+        if (user && authItem) {
+            const avatarUrl = user.avatar 
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                : 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+            authItem.innerHTML = `
+                <div class="user-pill" onclick="window.location.href='dashboard.html'" style="cursor:pointer">
+                    <img src="${avatarUrl}" class="user-avatar" style="width:30px; border-radius:50%; margin-right:10px;">
+                    <span class="user-nick" style="font-weight:bold">${user.username}</span>
+                </div>
+            `;
+        }
+
+        // 2. POBIERANIE DRUŻYN Z ARKUSZA
+        loadTeams();
+    });
+
+    async function loadTeams() {
+        const grid = document.getElementById('teams-grid');
+        
+        try {
+            const response = await fetch(API_URL);
+            const teams = await response.json();
+
+            grid.innerHTML = '';
+
+            if (!teams || teams.length === 0) {
+                grid.innerHTML = '<p class="no-teams" style="text-align:center; grid-column: 1/-1;">Rekrutacja trwa. Zapisz swoją drużynę!</p>';
+                return;
+            }
+
+            // Filtrowanie tylko zaakceptowanych (active)
+            const activeTeams = teams.filter(t => t.status === 'active');
+
+            if (activeTeams.length === 0) {
+                grid.innerHTML = '<p class="no-teams" style="text-align:center; grid-column: 1/-1;">Pierwsze drużyny są właśnie weryfikowane...</p>';
+                return;
+            }
+
+            activeTeams.forEach(team => {
+                const teamCard = document.createElement('div');
+                teamCard.className = 'team-card'; // Upewnij się, że masz .team-card w teams2.css
+                
+                teamCard.innerHTML = `
+                    <div class="team-logo-wrapper">
+                        <img src="${team.logo || 'default-logo.png'}" alt="${team.teamName}" onerror="this.src='default-logo.png'">
+                    </div>
+                    <div class="team-info">
+                        <h3>${team.teamName} <span>[${team.teamTag}]</span></h3>
+                        <p>Kapitan: <strong>${team.captain}</strong></p>
+                    </div>
+                `;
+                grid.appendChild(teamCard);
+            });
+
+        } catch (err) {
+            console.error(err);
+            grid.innerHTML = '<p class="error-msg" style="text-align:center; color: red; grid-column: 1/-1;">Błąd połączenia z bazą danych.</p>';
+        }
+    }
+    </script>
+</body>
+</html>

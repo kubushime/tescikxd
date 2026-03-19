@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common Ground | Mój Zespół</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="index.css"> 
+    <link rel="stylesheet" href="my-team.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <img src="logoliga.jpg" alt="Logo CGL" class="nav-logo">
+        <ul class="nav-links">
+            <li><a href="index.html">Start</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="teams.html">Drużyny</a></li>
+            <li><a href="my-team.html" style="color: var(--primary-green);">Mój zespół</a></li>
+            <li id="user-display"><a href="login.html" class="nav-btn login-special">Zaloguj się</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <div id="status-text" style="color: var(--primary-green); font-size: 0.8rem; letter-spacing: 3px; font-weight: bold; margin-bottom: 10px;">INICJALIZACJA...</div>
+            
+            <h1 id="team-name-display">TWOJA <span>DRUŻYNA</span></h1>
+            <p id="team-desc">Amatorska LIGA z dużymi ambicjami.</p>
+
+            <div class="cta-buttons" id="action-area">
+                <a href="matches.html" class="btn-main">ZOBACZ MECZE</a>
+                
+            </div>
+        </div>
+    </header>
+
+   
+
+    <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVAWDSMcgAhBZPiDurzNJtCju7HsfuFKgxduVMbjMYT25PG6a1IZ8QVOfqaryiGR4K/exec';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = JSON.parse(localStorage.getItem('cgl_user'));
+            let steam = localStorage.getItem('cgl_steam_link');
+
+            if (user) {
+                const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                document.getElementById('user-display').innerHTML = `
+                    <div class="user-pill" onclick="window.location.href='dashboard.html'">
+                        <img src="${avatarUrl}" class="user-avatar-pill">
+                        <span class="user-nick-pill">${user.username}</span>
+                    </div>`;
+            }
+
+            if (!user) return;
+
+            try {
+                const res = await fetch(`${APPS_SCRIPT_URL}?discordId=${user.id}&searchUser=${encodeURIComponent(steam || '')}`);
+                const data = await res.json();
+
+                if (data.found) {
+                    document.getElementById('status-text').innerText = data.status.toUpperCase();
+                    document.getElementById('team-name-display').innerHTML = `${data.teamName.toUpperCase()} <span>TEAM</span>`;
+                    document.getElementById('team-desc').innerText = `Tag: [${data.teamTag || '---'}] | Rola: ${data.role}`;
+
+                    if (data.role === 'Kapitan') {
+                        const editBtn = document.createElement('a');
+                        editBtn.href = "join.html?edit=true";
+                        editBtn.className = "btn-secondary";
+                        editBtn.innerText = "EDYTUJ SKŁAD";
+                        // Nie dodajemy marginesu w JS - CSS gap się tym zajmie
+                        document.getElementById('action-area').appendChild(editBtn);
+                    }
+                    loadMatches(data.teamName);
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        async function loadMatches(teamName) {
+            const res = await fetch(`${APPS_SCRIPT_URL}?action=getMatches`);
+            const matches = await res.json();
+            const myMatches = matches.filter(m => m.teamA === teamName || m.teamB === teamName);
+            const grid = document.getElementById('matches-grid');
+            
+            if (myMatches.length === 0) {
+                grid.innerHTML = '<p class="muted">Brak aktywnych operacji meczowych dla Twojego zespołu.</p>';
+                return;
+            }
+
+            grid.innerHTML = myMatches.map(m => `
+                <div class="match-panel-card">
+                    <div class="match-header-card">
+                        <span class="m-type">MECZ LIGOWY</span>
+                        <span class="m-status-pill ${m.status === 'Oczekuje na termin' ? 'p-wait' : 'p-ready'}">${m.status.toUpperCase()}</span>
+                    </div>
+                    <div class="match-vs-area">
+                        <div class="m-team-name">vs <strong>${m.teamA === teamName ? m.teamB : m.teamA}</strong></div>
+                        <div class="m-date-info">${m.date || 'Termin w ustalaniu'} ${m.time ? '• ' + m.time : ''}</div>
+                    </div>
+                    <a href="match.html?id=${m.id}" class="btn-match-action">WEJDŹ DO POKOJU</a>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

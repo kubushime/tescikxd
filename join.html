@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zgłoszenie Drużyny | Common Ground</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="join.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html"><img src="logoliga.jpg" alt="Logo CGL" class="nav-logo"></a>
+        <ul class="nav-links">
+            <li><a href="index.html">Start</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="teams.html">Drużyny</a></li>
+            <li><a href="my-team.html">Mój zespół</a></li>
+            <li id="user-display">
+                <a href="https://discord.gg/bw7rSeSnJS" class="nav-btn">Discord</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="join-container">
+        <div class="form-box">
+            <h2 class="badge">REKRUTACJA OTWARTA</h2>
+            <h1 id="form-title">Zapisz <span>Drużynę</span></h1>
+            <p class="form-intro">Wypełnij formularz zgodnie ze wzorem. Dane zostaną wysłane do administracji i zapisane w tabeli.</p>
+            
+            <form class="cgl-form" id="league-form">
+                
+                <div class="form-section">
+                    <h3>Podstawowe Informacje</h3>
+                    <input type="text" id="team_name_input" placeholder="NAZWA DRUŻYNY" required>
+                    <input type="text" id="team_tag_input" placeholder="TAG DRUŻYNY" required>
+                    <input type="text" id="captain_nick_input" placeholder="KAPITAN (Twój Nick)" required>
+                </div>
+
+                <div class="form-section">
+                    <h3>Skład Podstawowy (Linki Steam)</h3>
+                    <div class="input-grid">
+                        <input type="url" id="p1" placeholder="1: Link Steam" required>
+                        <input type="url" id="p2" placeholder="2: Link Steam" required>
+                        <input type="url" id="p3" placeholder="3: Link Steam" required>
+                        <input type="url" id="p4" placeholder="4: Link Steam" required>
+                        <input type="url" id="p5" placeholder="5: Link Steam" required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Zawodnicy Rezerwowi + Coach</h3>
+                    <div class="input-grid">
+                        <input type="text" id="r1" placeholder="R1 (Link / Brak)">
+                        <input type="text" id="r2" placeholder="R2 (Link / Brak)">
+                        <input type="text" id="r3" placeholder="R3 (Link / Brak)">
+                        <input type="text" id="coach" placeholder="C: Coach (Link / Brak)">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Logo Drużyny</h3>
+                    <input type="url" id="logo_url" placeholder="Link do grafiki logo (URL)" required>
+                </div>
+                
+                <p class="form-note">Wysyłając zgłoszenie, akceptujesz regulamin Ligi CGL.</p>
+                <button type="submit" id="submit-btn" class="btn-main">Wyślij Zgłoszenie</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Common Ground</h4>
+                <p>Chcemy być największą amatorską ligą w Polsce.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Społeczność</h4>
+                <div class="social-icons">
+                    <a href="https://discord.gg/bw7rSeSnJS" class="social-btn discord-footer">DISCORD</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Common Ground League. Wszystkie prawa zastrzeżone.
+        </div>
+    </footer>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        (function(){
+            emailjs.init("6OImYRC4XRBs0d7pJ");
+        })();
+
+        // TWÓJ AKTUALNY LINK WEB APP
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzVAWDSMcgAhBZPiDurzNJtCju7HsfuFKgxduVMbjMYT25PG6a1IZ8QVOfqaryiGR4K/exec';
+
+        document.getElementById('league-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const userData = JSON.parse(localStorage.getItem('cgl_user'));
+            if (!userData) {
+                alert("Musisz być zalogowany przez Discord!");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = 'Wysyłanie...';
+            btn.disabled = true;
+
+            // Obiekt danych - nazwy kluczy dopasowane do Twojego skryptu Google
+            const payload = {
+                teamName: document.getElementById('team_name_input').value,
+                teamTag: document.getElementById('team_tag_input').value,
+                captainName: document.getElementById('captain_nick_input').value,
+                p1: document.getElementById('p1').value,
+                p2: document.getElementById('p2').value,
+                p3: document.getElementById('p3').value,
+                p4: document.getElementById('p4').value,
+                p5: document.getElementById('p5').value,
+                r1: document.getElementById('r1').value || "Brak",
+                r2: document.getElementById('r2').value || "Brak",
+                r3: document.getElementById('r3').value || "Brak",
+                coach: document.getElementById('coach').value || "Brak",
+                logo: document.getElementById('logo_url').value,
+                discordId: userData.id
+            };
+
+            try {
+                // 1. Wysyłka do Google Sheets (tryb tekstowy dla no-cors)
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+
+                // 2. Wysyłka EmailJS (opcjonalnie)
+                await emailjs.send('service_0e18ako', 'template_j6enhlo', payload);
+
+                // Zapis lokalny dla Dashboardu
+                localStorage.setItem('cgl_my_team', payload.teamName);
+                localStorage.setItem('cgl_team_status', 'pending');
+
+                Swal.fire({
+    title: 'SUKCES!',
+    text: 'Twoje zgłoszenie zostało pomyślnie przetworzone.',
+    icon: 'success',
+    background: '#1a1a1a', // Ciemne tło pasujące do strony
+    color: '#fff',         // Biały tekst
+    confirmButtonColor: '#00ff88', // Twój zielony kolor ligi
+    confirmButtonText: 'ŚWIETNIE',
+    customClass: {
+        popup: 'my-swal-popup'
+    }
+}).then((result) => {
+    if (result.isConfirmed) {
+        window.location.href = 'dashboard.html';
+    }
+});
+                window.location.href = 'dashboard.html';
+
+            } catch (error) {
+                console.error("Błąd wysyłki:", error);
+                alert('Błąd serwera. Sprawdź połączenie i spróbuj ponownie.');
+                btn.innerText = 'Wyślij Zgłoszenie';
+                btn.disabled = false;
+            }
+        });
+
+        // Obsługa profilu w nawigacji
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('cgl_user'));
+            const userDisplay = document.getElementById('user-display');
+            if (user && userDisplay) {
+                const avatar = user.avatar 
+                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
+                    : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                userDisplay.innerHTML = `
+                    <div class="user-pill" onclick="window.location.href='dashboard.html'" style="cursor:pointer;">
+                        <img src="${avatar}" class="user-avatar" style="width:30px; border-radius:50%; margin-right:10px;">
+                        <span class="user-nick" style="font-weight:bold">${user.username}</span>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Room | CGL</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="match-room.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <img src="logoliga.jpg" alt="Logo CGL" class="nav-logo">
+        <ul class="nav-links">
+            <li><a href="index.html">Start</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="teams.html">Drużyny</a></li>
+            <li><a href="my-team.html" style="color: var(--primary-green);">Mój zespół</a></li>
+            <li id="user-display"></li>
+        </ul>
+    </nav>
+
+    <main class="match-container">
+        <header class="match-header">
+            <div class="match-meta">
+                <span class="m-id">PROTOKÓŁ #<span id="m-id-val">---</span></span>
+                <span id="m-status-pill" class="m-status-pill">POBIERANIE...</span>
+            </div>
+            <div class="vs-wrapper">
+                <div class="team-block"><h1 id="team-a-name">TEAM A</h1><span class="side-tag">HOME</span></div>
+                <div class="vs-divider">VS</div>
+                <div class="team-block"><h1 id="team-b-name">TEAM B</h1><span class="side-tag">AWAY</span></div>
+            </div>
+            <p id="match-time-full" class="match-time-sub">Inicjalizacja pokoju...</p>
+        </header>
+
+        <div class="match-grid">
+            <section class="match-panel veto-area">
+                <div class="panel-head"><h3>WYBÓR MAPY / TERMIN</h3></div>
+                <div class="panel-body">
+                    <div id="captain-scheduler" class="scheduler-box" style="display: none;">
+                        <span class="mini-label">ZAPROPONUJ TERMIN (KAPITAN)</span>
+                        <div class="schedule-inputs">
+                            <input type="date" id="date-in">
+                            <input type="time" id="time-in">
+                            <button class="btn-save-mini" onclick="updateMatchTime()">ZAPISZ</button>
+                        </div>
+                    </div>
+
+                    <span class="mini-label">SYSTEM VETO - AKTUALNA PULA</span>
+                    <div class="map-grid" id="map-grid-container">
+                        <div class="map-card" data-map="ancient" onclick="processBan(this, 'ancient')">
+                            <img src="https://www.hltv.org/img/static/maps/ancient.png" onerror="this.src='https://placehold.co/600x400/111/00ff88?text=ANCIENT'">
+                            <span>ANCIENT</span>
+                        </div>
+                        <div class="map-card" data-map="anubis" onclick="processBan(this, 'anubis')">
+                            <img src="https://www.hltv.org/img/static/maps/anubis.png" onerror="this.src='https://placehold.co/600x400/111/00ff88?text=ANUBIS'">
+                            <span>ANUBIS</span>
+                        </div>
+                        <div class="map-card" data-map="inferno" onclick="processBan(this, 'inferno')">
+                            <img src="https://www.hltv.org/img/static/maps/inferno.png" onerror="this.src='https://placehold.co/600x400/111/00ff88?text=INFERNO'">
+                            <span>INFERNO</span>
+                        </div>
+                        <div class="map-card" data-map="mirage" onclick="processBan(this, 'mirage')">
+                            <img src="https://www.hltv.org/img/static/maps/mirage.png" onerror="this.src='https://placehold.co/600x400/111/00ff88?text=MIRAGE'">
+                            <span>MIRAGE</span>
+                        </div>
+                        <div class="map-card" data-map="nuke" onclick="processBan(this, 'nuke')">
+                            <img src="https://www.hltv.org/img/static/maps/nuke.png" onerror="this.src='https://placehold.co/600x400/111/00ff88?text=NUKE'">
+                            <span>NUKE</span>
+                        </div>
+                        <div class="map-card" data-map="overpass" onclick="processBan(this, 'overpass')">
+                            <img src="https://www.hltv.org/img/static/maps/overpass.png" onerror="this.src='https://placehold.co/600x400/111/00ff88?text=OVERPASS'">
+                            <span>OVERPASS</span>
+                        </div>
+                        <div class="map-card" data-map="dust2" onclick="processBan(this, 'dust2')">
+                            <img src="https://www.hltv.org/img/static/maps/dust2.png" onerror="this.src='https://placehold.co/600x400/111/00ff88?text=DUST2'">
+                            <span>DUST II</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="match-panel chat-area">
+                <div class="panel-head"><h3>CZAT TAKTYCZNY</h3></div>
+                <div id="chat-box" class="chat-box"></div>
+                <div class="chat-input">
+                    <input type="text" id="chat-in" placeholder="Wiadomość...">
+                    <button onclick="sendMessage()">OK</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVAWDSMcgAhBZPiDurzNJtCju7HsfuFKgxduVMbjMYT25PG6a1IZ8QVOfqaryiGR4K/exec'; 
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('id');
+        let isCaptain = false;
+        let lastChatContent = "";
+
+        async function refreshData() {
+            try {
+                const res = await fetch(`${APPS_SCRIPT_URL}?action=getMatches`);
+                const matches = await res.json();
+                const m = matches.find(x => x.id.toString() === matchId);
+                
+                if (m) {
+                    document.getElementById('team-a-name').innerText = m.teamA;
+                    document.getElementById('team-b-name').innerText = m.teamB;
+                    document.getElementById('match-time-full').innerText = m.date ? `${m.date} • ${m.time}` : "Termin do ustalenia";
+                    
+                    const pill = document.getElementById('m-status-pill');
+                    pill.innerText = m.status.toUpperCase();
+                    pill.className = `m-status-pill ${m.status === 'Zaplanowany' ? 'p-ready' : 'p-wait'}`;
+
+                    // --- OBSŁUGA VETO ---
+                    if (m.propA) {
+                        const bans = m.propA.split(',');
+                        bans.forEach(map => {
+                            const card = document.querySelector(`[data-map="${map.trim().toLowerCase()}"]`);
+                            if (card && !card.classList.contains('banned')) {
+                                card.classList.add('banned');
+                                card.innerHTML += '<div class="ban-overlay">BANNED</div>';
+                            }
+                        });
+                    }
+
+                    // --- OBSŁUGA CZATU ---
+                    if (m.propB && m.propB !== lastChatContent) {
+                        lastChatContent = m.propB;
+                        const chatBox = document.getElementById('chat-box');
+                        const messages = m.propB.split('|');
+                        
+                        chatBox.innerHTML = messages.map(msg => {
+                            const isSystem = msg.includes("System:");
+                            const isCaptainMsg = !isSystem; // Można rozbudować o sprawdzanie nicku
+                            return `<div class="chat-msg ${isSystem ? 'sys' : (isCaptainMsg ? 'captain' : '')}">${msg}</div>`;
+                        }).join('');
+                        
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    }
+                }
+            } catch (e) { console.error("Sync error:", e); }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-in');
+            const msg = input.value.trim();
+            const user = JSON.parse(localStorage.getItem('cgl_user'));
+
+            if (!msg || !user) return;
+            input.value = '';
+
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: "sendChat",
+                    matchId: matchId,
+                    user: user.username,
+                    message: msg
+                })
+            });
+            refreshData();
+        }
+
+        async function processBan(el, mapName) {
+            if (!isCaptain) return Swal.fire('Odmowa','Tylko kapitan może banować mapy!','error');
+            if (el.classList.contains('banned')) return;
+            
+            const user = JSON.parse(localStorage.getItem('cgl_user'));
+
+            // Optymistyczne dodanie bana lokalnie
+            el.classList.add('banned');
+            el.innerHTML += '<div class="ban-overlay">BANNED</div>';
+            
+            // 1. Wyślij ban mapy
+            await fetch(APPS_SCRIPT_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: "vetoMap", matchId: matchId, map: mapName }) 
+            });
+
+            // 2. Wyślij info na czat jako System
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: "sendChat",
+                    matchId: matchId,
+                    user: "System",
+                    message: `Kapitan ${user.username} zbanował mapę ${mapName.toUpperCase()}`
+                })
+            });
+
+            refreshData();
+        }
+
+        async function updateMatchTime() {
+            const d = document.getElementById('date-in').value;
+            const t = document.getElementById('time-in').value;
+            if(!d || !t) return Swal.fire('Błąd','Wybierz datę i czas','warning');
+            Swal.fire({ title: 'Zapisywanie...', didOpen: () => Swal.showLoading() });
+            
+            await fetch(APPS_SCRIPT_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: "updateMatch", matchId: matchId, date: d, time: t }) 
+            });
+            Swal.fire('Zapisano','Pomyślnie zaktualizowano termin','success').then(() => refreshData());
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = JSON.parse(localStorage.getItem('cgl_user'));
+            const steam = localStorage.getItem('cgl_steam_link');
+
+            if (user) {
+                const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                document.getElementById('user-display').innerHTML = `
+                    <div class="user-pill" onclick="window.location.href='dashboard.html'" style="cursor:pointer; display:flex; align-items:center; background: rgba(0, 255, 136, 0.05); border: 1px solid #00ff88; padding: 5px 15px; border-radius: 50px;">
+                        <img src="${avatarUrl}" style="width:25px; border-radius:50%; margin-right:10px; border: 1px solid #00ff88;">
+                        <span style="font-weight:900; color:white; font-size: 14px;">${user.username}</span>
+                    </div>`;
+            }
+
+            if (!matchId) return;
+            document.getElementById('m-id-val').innerText = matchId;
+
+            await refreshData();
+            setInterval(refreshData, 5000);
+
+            if (user && steam) {
+                const res = await fetch(`${APPS_SCRIPT_URL}?discordId=${user.id}&searchUser=${encodeURIComponent(steam)}`);
+                const data = await res.json();
+                
+                // Opóźnione sprawdzenie kapitana po pobraniu nazw drużyn
+                setTimeout(() => {
+                    const teamA = document.getElementById('team-a-name').innerText;
+                    const teamB = document.getElementById('team-b-name').innerText;
+                    if (data.found && data.role === 'Kapitan' && (data.teamName === teamA || data.teamName === teamB)) {
+                        isCaptain = true;
+                        document.getElementById('captain-scheduler').style.display = 'block';
+                    }
+                }, 1000);
+            }
+        });
+
+        // Enter wysyła wiadomość
+        document.getElementById('chat-in').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>

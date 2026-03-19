@@ -1,0 +1,254 @@
+/* --- KONFIGURACJA ZMIENNYCH --- */
+:root {
+    --bg-dark: #0a0a0a;          /* Głęboka czerń tła */
+    --card-bg: rgba(255, 255, 255, 0.03); /* Przezroczyste karty */
+    --primary-green: #2ecc71;    /* Główny neonowy zielony */
+    --soft-green: #a8e6cf;       /* Delikatny zielony do tekstów */
+    --accent-glow: rgba(46, 204, 113, 0.4); /* Poświata neonu */
+    --nav-height: 80px;
+}
+
+/* --- RESET I PODSTAWY --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- TŁO RADIALNE (Efekt głębi) --- */
+.main-content {
+    flex: 1;
+    padding-top: calc(var(--nav-height) + 40px);
+    background: radial-gradient(circle at top center, rgba(46, 204, 113, 0.08) 0%, transparent 70%);
+}
+
+/* --- NAWIGACJA --- */
+.navbar {
+    height: var(--nav-height);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10%;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.nav-logo {
+    height: 50px;
+    border-radius: 8px;
+    transition: transform 0.3s;
+}
+
+.nav-logo:hover {
+    transform: scale(1.05);
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    transition: 0.3s;
+    padding: 5px 0;
+}
+
+.nav-links a:hover, 
+.nav-links a.active {
+    color: var(--primary-green);
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.nav-links a.active {
+    border-bottom: 2px solid var(--primary-green);
+}
+
+.nav-btn {
+    background: var(--primary-green);
+    color: #000 !important;
+    padding: 10px 20px !important;
+    border-radius: 6px;
+    transition: 0.3s !important;
+}
+
+.nav-btn:hover {
+    box-shadow: 0 0 20px var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+/* --- NAGŁÓWKI I TYPOGRAFIA --- */
+h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+h1 span {
+    color: var(--primary-green);
+    text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 15px;
+    background: rgba(46, 204, 113, 0.1);
+    border: 1px solid var(--primary-green);
+    color: var(--primary-green);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+/* --- KONTENERY TREŚCI --- */
+.content-section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.text-block {
+    text-align: left;
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 40px;
+}
+
+.text-block h3 {
+    color: var(--primary-green);
+    margin: 25px 0 10px;
+}
+
+/* --- STOPKA (FOOTER) --- */
+.main-footer {
+    padding: 80px 10% 40px;
+    background: #050505;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 60px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-section h4 {
+    color: var(--primary-green);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.footer-section p {
+    color: #888;
+    max-width: 300px;
+    font-size: 0.9rem;
+}
+
+.social-btn.discord-footer {
+    display: inline-block;
+    background: #5865F2;
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 800;
+    transition: 0.3s;
+}
+
+.social-btn.discord-footer:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(88, 101, 242, 0.4);
+}
+
+.footer-bottom {
+    text-align: center;
+    color: #333;
+    font-size: 0.8rem;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* --- RESPONSYWNOŚĆ --- */
+@media (max-width: 768px) {
+    .navbar { padding: 0 5%; }
+    .nav-links { display: none; } /* Możesz dodać menu mobilne później */
+    .footer-content { flex-direction: column; text-align: center; }
+    .footer-section p { margin: 0 auto; }
+}
+/* KONTENER PROFILU W NAVBARZE */
+.user-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(46, 204, 113, 0.1); /* Subtelne zielone tło */
+    border: 1px solid var(--primary-green);
+    padding: 6px 16px;
+    border-radius: 50px; /* Kształt pigułki */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 42px; /* Stała wysokość, żeby nie rozpychać navbaru */
+}
+
+.user-pill:hover {
+    background: rgba(46, 204, 113, 0.2);
+    box-shadow: 0 0 15px var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+/* AVATAR UŻYTKOWNIKA */
+.user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--primary-green);
+    object-fit: cover; /* Zapobiega rozciąganiu obrazka */
+}
+
+/* NICK UŻYTKOWNIKA */
+.user-nick {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: none; /* Nick zachowuje oryginalną wielkość liter */
+    letter-spacing: 0.5px;
+}
+
+/* DOPASOWANIE NAV-LINKS DLA ZALOGOWANEGO */
+.nav-links {
+    display: flex;
+    align-items: center; /* Centruje profil w pionie względem linków */
+}

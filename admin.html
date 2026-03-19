@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | CGL</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <img src="logoliga.jpg" class="admin-logo" alt="Logo">
+            <nav>
+                <button onclick="showSection('teams')" id="btn-teams" class="active">🛡️ Zgłoszenia</button>
+                <button onclick="showSection('matches')" id="btn-matches">🎮 Mecze</button>
+                <a href="index.html" class="back-link">↩ Powrót do strony</a>
+            </nav>
+        </aside>
+
+        <main class="admin-content">
+            <header>
+                <h1>Panel <span>Administratora</span></h1>
+                <p id="admin-status" class="status-connected">Połączono: <span id="admin-name">CGL Admin</span></p>
+            </header>
+
+            <section id="section-teams" class="admin-section">
+                <div class="section-header">
+                    <h2>Oczekujące Zgłoszenia</h2>
+                    <button class="btn-refresh" onclick="fetchTeams()">🔄 Odśwież</button>
+                </div>
+                <div id="pending-list" class="admin-list">
+                    <p class="loader">Ładowanie zgłoszeń...</p>
+                </div>
+            </section>
+
+            <section id="section-matches" class="admin-section" style="display:none;">
+                <div class="admin-card">
+                    <h2>Zarządzanie Kolejką</h2>
+                    <div class="admin-btns-row">
+                        <button onclick="shuffleAndCreateMatches()" class="btn-main">🎲 LOSUJ NOWĄ KOLEJKĘ</button>
+                        <button onclick="loadAdminMatches()" class="btn-outline">🔄 Odśwież listę</button>
+                    </div>
+                </div>
+
+                <div class="admin-card" style="margin-top: 20px;">
+                    <h3>Stwórz Parę Ręcznie</h3>
+                    <div class="match-creator">
+                        <select id="select-team-a" class="admin-select"></select>
+                        <span class="vs-text">VS</span>
+                        <select id="select-team-b" class="admin-select"></select>
+                        <button onclick="createManualMatch()" class="btn-approve">Dodaj Mecz</button>
+                    </div>
+                </div>
+                
+                <div id="matches-admin-list" class="admin-list" style="margin-top: 30px;">
+                    <p class="loader">Ładowanie meczów...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const ADMIN_ID = "439429439160582156"; 
+        const user = JSON.parse(localStorage.getItem('cgl_user'));
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzVAWDSMcgAhBZPiDurzNJtCju7HsfuFKgxduVMbjMYT25PG6a1IZ8QVOfqaryiGR4K/exec';
+
+        if (!user || user.id !== ADMIN_ID) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('admin-name').innerText = user.username;
+        }
+
+        async function fetchTeams() {
+            const list = document.getElementById('pending-list');
+            list.innerHTML = '<p class="loader">Ładowanie danych...</p>';
+            try {
+                const res = await fetch(`${API_URL}?action=getAll`);
+                const teams = await res.json();
+                renderTeams(teams);
+            } catch (e) { list.innerHTML = '<p style="color:red">Błąd połączenia.</p>'; }
+        }
+
+        function renderTeams(teams) {
+            const list = document.getElementById('pending-list');
+            list.innerHTML = teams.filter(t => t.status === 'pending').map(team => `
+                <div class="admin-item">
+                    <div class="item-info">
+                        <strong>${team.teamName} <span class="tag">${team.teamTag}</span></strong>
+                        <span>Kapitan: ${team.captain}</span>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-approve" onclick="updateStatus(${team.rowId}, 'active')">Akceptuj</button>
+                        <button class="btn-reject" onclick="updateStatus(${team.rowId}, 'rejected')">Odrzuć</button>
+                    </div>
+                </div>
+            `).join('') || '<p class="empty-msg">Brak nowych zgłoszeń.</p>';
+        }
+
+        async function updateStatus(rowId, status) {
+            Swal.fire({ title: 'Przetwarzanie...', didOpen: () => Swal.showLoading() });
+            try {
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'updateStatus', rowId: rowId, status: status }) });
+                Swal.fire({ title: 'Sukces!', icon: 'success' });
+                fetchTeams();
+            } catch (e) { Swal.fire('Błąd!', '', 'error'); }
+        }
+
+        function showSection(name) {
+            document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+            document.getElementById('section-' + name).style.display = 'block';
+            document.querySelectorAll('.admin-sidebar button').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + name).classList.add('active');
+            if(name === 'matches') { loadAdminMatches(); loadTeamsForPairing(); }
+        }
+
+        async function loadAdminMatches() {
+            const list = document.getElementById('matches-admin-list');
+            list.innerHTML = '<p class="loader">Wczytywanie...</p>';
+            const res = await fetch(`${API_URL}?action=getMatches`);
+            const matches = await res.json();
+            list.innerHTML = matches.map(m => `
+                <div class="admin-item">
+                    <div class="item-info">
+                        <strong>${m.teamA} vs ${m.teamB}</strong>
+                        <span>Status: ${m.status} | Termin: ${m.date || 'TBD'} ${m.time || ''}</span>
+                    </div>
+                </div>
+            `).join('') || '<p>Brak meczów.</p>';
+        }
+
+        async function loadTeamsForPairing() {
+            const res = await fetch(`${API_URL}?action=getAll`);
+            const teams = await res.json();
+            const activeTeams = teams.filter(t => t.status === 'active');
+            const options = activeTeams.map(t => `<option value="${t.teamName}">${t.teamName}</option>`).join('');
+            document.getElementById('select-team-a').innerHTML = options;
+            document.getElementById('select-team-b').innerHTML = options;
+        }
+
+        async function createManualMatch() {
+            const tA = document.getElementById('select-team-a').value;
+            const tB = document.getElementById('select-team-b').value;
+            if(tA === tB) return alert("Wybierz dwie różne drużyny!");
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'createMatch', teamA: tA, teamB: tB }) });
+            Swal.fire('Mecz dodany!', '', 'success');
+            loadAdminMatches();
+        }
+
+        async function shuffleAndCreateMatches() {
+            const res = await fetch(`${API_URL}?action=getAll`);
+            const allTeams = await res.json();
+            let activeTeams = allTeams.filter(t => t.status === 'active');
+            if (activeTeams.length < 2) return Swal.fire("Błąd", "Minimum 2 drużyny!", "error");
+
+            const confirm = await Swal.fire({ title: 'Losować?', showCancelButton: true });
+            if (confirm.isConfirmed) {
+                activeTeams.sort(() => 0.5 - Math.random());
+                for (let i = 0; i < activeTeams.length - 1; i += 2) {
+                    await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'createMatch', teamA: activeTeams[i].teamName, teamB: activeTeams[i+1].teamName }) });
+                }
+                Swal.fire("Gotowe!", "", "success");
+                loadAdminMatches();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchTeams);
+    </script>
+</body>
+</html>

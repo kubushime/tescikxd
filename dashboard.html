@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Gracza | Common Ground League</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html"><img src="logoliga.jpg" alt="Logo CGL" class="nav-logo"></a>
+        <ul class="nav-links">
+            <li><a href="index.html">Start</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="teams.html">Drużyny</a></li>
+            <li><a href="my-team.html">Mój zespół</a></li>
+            <li id="user-display"></li>
+        </ul>
+    </nav>
+
+    <main class="dashboard-container">
+        <header class="db-header">
+            <h2 class="badge">PANEL ZAWODNIKA</h2>
+            <h1 id="welcome-msg">Witaj, <span id="user-name-span">Graczu</span></h1>
+        </header>
+
+        <div class="db-grid">
+            
+            <section class="db-card profile-card">
+                <div class="card-header">
+                    <h3>Twój Profil Discord</h3>
+                </div>
+                <div class="profile-info">
+                    <img id="db-avatar" src="placeholder-avatar.png" alt="Avatar">
+                    <div class="profile-details">
+                        <h4 id="db-username">Wczytywanie...</h4>
+                        <p id="db-id">ID: 00000000000000</p>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()" style="margin-top: 20px;">Wyloguj się</button>
+            </section>
+
+            <section class="db-card team-card" id="team-section">
+                <div class="card-header">
+                    <h3>Twoja Drużyna</h3>
+                    <span id="team-status-badge" class="status-tag status-none">Ładowanie...</span>
+                </div>
+                <div id="team-content" class="team-content">
+                    <p>Łączenie z bazą danych...</p>
+                </div>
+            </section>
+
+            <section class="db-card xplay-card">
+                <div class="card-header">
+                    <h3>Powiązane Konta</h3>
+                    <span id="steam-status-tag" class="status-tag status-off">OFF</span>
+                </div>
+                <div class="xplay-content">
+                    <div class="status-row">
+                        <span>Konto Steam:</span>
+                        <span id="steam-status-text" class="status-text text-red">Niepołączone</span>
+                    </div>
+                    <p class="info-text small">Połącz konto Steam, aby system mógł automatycznie przypisać Cię do Twojej drużyny.</p>
+                    <button id="steam-action-btn" onclick="openSteamModal()" class="btn-steam">Połącz Profil Steam</button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <div id="steam-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <h2>Połącz Konto Steam 🎮</h2>
+            <p>Wklej pełny link do swojego profilu Steam.</p>
+            <input type="url" id="steam-input" placeholder="https://steamcommunity.com/id/TwójNick/">
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="saveSteamLink()" class="btn-approve-modal">Zapisz</button>
+                <button onclick="closeSteamModal()" class="btn-reject-modal">Anuluj</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const ADMIN_ID = "439429439160582156"; 
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVAWDSMcgAhBZPiDurzNJtCju7HsfuFKgxduVMbjMYT25PG6a1IZ8QVOfqaryiGR4K/exec';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const userData = JSON.parse(localStorage.getItem('cgl_user'));
+        if (!userData) { window.location.href = 'login.html'; return; }
+        displayProfile(userData);
+
+        let savedSteam = localStorage.getItem('cgl_steam_link');
+        if (savedSteam) {
+            updateSteamUI(savedSteam);
+            await checkGlobalStatus(userData.id, savedSteam);
+        } else {
+            displayNoSteamUI();
+        }
+    });
+
+    function displayProfile(user) {
+        document.getElementById('user-name-span').innerText = user.username;
+        document.getElementById('db-username').innerText = user.username;
+        document.getElementById('db-id').innerText = `ID: ${user.id}`;
+        const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+        document.getElementById('db-avatar').src = avatarUrl;
+        
+        const userDisplay = document.getElementById('user-display');
+        if (userDisplay) {
+            userDisplay.innerHTML = `<div class="user-pill" onclick="window.location.href='dashboard.html'"><img src="${avatarUrl}" class="user-avatar"><span class="user-nick">${user.username}</span></div>`;
+        }
+
+        if (user.id === ADMIN_ID) {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks && !document.getElementById('admin-btn')) {
+                const adminLink = document.createElement('li');
+                adminLink.id = "admin-btn";
+                adminLink.innerHTML = `<a href="admin.html" class="admin-nav-link">🛡️ ADMIN</a>`;
+                navLinks.prepend(adminLink);
+            }
+        }
+    }
+
+    async function checkGlobalStatus(discordId, steamLink) {
+        try {
+            const response = await fetch(`${APPS_SCRIPT_URL}?discordId=${discordId}&searchUser=${encodeURIComponent(steamLink)}`);
+            const data = await response.json();
+            const badge = document.getElementById('team-status-badge');
+            const container = document.getElementById('team-content');
+
+            if (data.found) {
+                const statusLower = data.status ? data.status.toLowerCase() : 'pending';
+                badge.innerText = statusLower === 'active' ? 'Aktywna' : 'W weryfikacji';
+                badge.className = statusLower === 'active' ? 'status-tag status-active' : 'status-tag status-pending';
+
+                // NOWY WIDOK KARTY DRUŻYNY Z PRZYCISKIEM DO MECZÓW
+                container.innerHTML = `
+                    <div class="my-team-box ${statusLower === 'active' ? 'active-box' : ''}">
+                        <h4 class="team-title-db">${data.teamName}</h4>
+                        <p class="role-text">Twoja rola: <strong>${data.role}</strong></p>
+                        
+                        <div class="team-actions-grid">
+                            ${statusLower === 'active' ? `
+                                <a href="my-team.html" class="btn-main-green">
+                                    🎮 ZARZĄDZAJ MECZAMI
+                                </a>
+                            ` : `<p class="pending-info">Mecze będą dostępne po weryfikacji drużyny.</p>`}
+                            
+                            <div class="secondary-actions">
+                                ${data.role === 'Kapitan' ? `<a href="join.html?edit=true" class="btn-edit-small">Edytuj Skład</a>` : ''}
+                                <button onclick="leaveTeam()" class="btn-leave-small">${data.role === 'Kapitan' ? 'Usuń' : 'Opuść'}</button>
+                            </div>
+                        </div>
+                    </div>`;
+            } else {
+                displayNoTeamUI();
+            }
+        } catch (e) {
+            console.error("Błąd bazy danych:", e);
+            container.innerHTML = "<p>Błąd połączenia z bazą.</p>";
+        }
+    }
+
+    // Funkcje pomocnicze UI
+    function displayNoTeamUI() {
+        document.getElementById('team-status-badge').innerText = "Brak";
+        document.getElementById('team-status-badge').className = "status-tag status-none";
+        document.getElementById('team-content').innerHTML = `
+            <p>Nie należysz do żadnej drużyny.</p>
+            <a href="join.html" class="btn-create-team">Załóż Drużynę</a>`;
+    }
+
+    function displayNoSteamUI() {
+        document.getElementById('team-status-badge').innerText = "Wymagany Steam";
+        document.getElementById('team-content').innerHTML = `<p style="color: #888;">Połącz profil Steam, aby zobaczyć swoją drużynę.</p>`;
+    }
+
+    function updateSteamUI(link) {
+        document.getElementById('steam-status-tag').innerText = "ON";
+        document.getElementById('steam-status-tag').className = "status-tag status-active";
+        document.getElementById('steam-status-text').innerText = "Połączono";
+        document.getElementById('steam-status-text').className = "status-text text-green";
+        document.getElementById('steam-action-btn').innerText = "Zmień Link Steam";
+    }
+
+    // Obsługa Steam Modal
+    function openSteamModal() { document.getElementById('steam-modal').style.display = 'flex'; }
+    function closeSteamModal() { document.getElementById('steam-modal').style.display = 'none'; }
+
+    async function saveSteamLink() {
+        const link = document.getElementById('steam-input').value.trim();
+        const user = JSON.parse(localStorage.getItem('cgl_user'));
+        if (link.includes('steamcommunity.com')) {
+            Swal.fire({ title: 'Łączenie...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+            try {
+                await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'linkSteam', discordId: user.id, steamLink: link, username: user.username }) });
+                localStorage.setItem('cgl_steam_link', link);
+                location.reload();
+            } catch (e) { Swal.fire('Błąd!', 'Nie udało się połączyć.', 'error'); }
+        } else {
+            Swal.fire('Błąd!', 'Wklej poprawny link Steam!', 'error');
+        }
+    }
+
+    async function leaveTeam() {
+        const user = JSON.parse(localStorage.getItem('cgl_user'));
+        const result = await Swal.fire({ title: 'Jesteś pewien?', text: "Ta akcja jest nieodwracalna!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ff4757', background: '#1a1a1a', color: '#fff' });
+        if (result.isConfirmed) {
+            await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "leaveTeam", discordId: user.id }) });
+            location.reload();
+        }
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'index.html';
+    }
+</script>
+
+<style>
+    /* --- NOWE STYLE DLA DASHBOARDU --- */
+    .my-team-box {
+        background: rgba(255,255,255,0.02);
+        padding: 25px;
+        border-radius: 16px;
+        border: 1px solid #222;
+        transition: 0.3s;
+    }
+    .active-box { border-color: #00ff88; background: rgba(0, 255, 136, 0.02); }
+    
+    .team-title-db { color: #fff; font-size: 1.6rem; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
+    .role-text { color: #888; font-size: 0.9rem; margin-bottom: 20px; }
+    .role-text strong { color: #00ff88; }
+
+    .team-actions-grid { display: flex; flex-direction: column; gap: 15px; }
+
+    /* GŁÓWNY PRZYCISK MECZÓW */
+    .btn-main-green {
+        display: block;
+        background: #00ff88;
+        color: #000;
+        text-decoration: none;
+        text-align: center;
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: 900;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+    }
+    .btn-main-green:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+        background: #00e67a;
+    }
+
+    .secondary-actions { display: flex; gap: 10px; }
+    
+    .btn-edit-small, .btn-leave-small {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-edit-small { background: #222; color: #fff; border: 1px solid #444; }
+    .btn-edit-small:hover { border-color: #00ff88; color: #00ff88; }
+
+    .btn-leave-small { background: none; color: #ff4757; border: 1px solid #ff4757; }
+    .btn-leave-small:hover { background: #ff4757; color: #fff; }
+
+    .btn-create-team {
+        display: inline-block;
+        margin-top: 15px;
+        background: #00ff88;
+        color: #000;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 900;
+        text-decoration: none;
+    }
+
+    .pending-info { color: #ffcc00; font-size: 0.85rem; font-style: italic; }
+
+    /* Nawigacja */
+    .admin-nav-link { color: #ff4757 !important; font-weight: 900; border: 1px solid #ff4757; padding: 5px 12px; border-radius: 6px; }
+    .user-pill { display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 20px; cursor: pointer; }
+    .user-avatar { width: 25px; height: 25px; border-radius: 50%; margin-right: 10px; }
+
+    /* Modal */
+    .btn-approve-modal { flex: 1; border:none; padding: 12px; cursor: pointer; border-radius: 8px; background:#00ff88; color:#000; font-weight:bold; }
+    .btn-reject-modal { flex: 1; padding: 12px; cursor: pointer; border-radius: 8px; background: #222; color: #fff; border: 1px solid #444; }
+</style>
+</body>
+</html>

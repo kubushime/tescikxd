@@ -1,0 +1,293 @@
+/* =========================================
+   1. LAYOUT GŁÓWNY I NAGŁÓWEK
+   ========================================= */
+.faq-page {
+    padding: 140px 20px 80px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(circle at top, rgba(46, 204, 113, 0.08) 0%, var(--bg-dark) 70%);
+}
+
+.faq-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.faq-header h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: -2px;
+    margin-bottom: 15px;
+}
+
+.faq-header h1 span {
+    color: var(--primary-green);
+    text-shadow: 0 0 30px var(--accent-glow);
+}
+
+.faq-header p {
+    color: var(--soft-green);
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+/* =========================================
+   2. FAQ ACCORDION (Lista Pytań)
+   ========================================= */
+.faq-wrapper {
+    max-width: 850px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.faq-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+}
+
+.faq-item:hover {
+    border-color: rgba(46, 204, 113, 0.4);
+    background: rgba(46, 204, 113, 0.02);
+    transform: translateX(10px);
+}
+
+.faq-question {
+    width: 100%;
+    padding: 25px;
+    background: none;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+}
+
+.icon {
+    color: var(--primary-green);
+    font-size: 1.4rem;
+    transition: transform 0.4s ease;
+    background: rgba(46, 204, 113, 0.1);
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.faq-answer {
+    max-height: 0;
+    padding: 0 25px;
+    color: var(--soft-green);
+    line-height: 1.7;
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+/* Stan aktywny pytania */
+.faq-item.active {
+    background: rgba(46, 204, 113, 0.05);
+    border-color: var(--primary-green);
+    box-shadow: 0 0 30px rgba(46, 204, 113, 0.1);
+}
+
+.faq-item.active .faq-answer {
+    max-height: 300px;
+    padding-bottom: 25px;
+    opacity: 1;
+}
+
+.faq-item.active .icon {
+    transform: rotate(135deg);
+    background: var(--primary-green);
+    color: #000;
+}
+
+/* =========================================
+   3. MODAL (Okienko Kontaktowe)
+   ========================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: #0f0f0f;
+    border: 1px solid var(--primary-green);
+    padding: 45px;
+    border-radius: 20px;
+    position: relative;
+    width: 95%;
+    max-width: 500px;
+    transform: translateY(50px) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 0 60px rgba(46, 204, 113, 0.2);
+}
+
+.modal-overlay.show .modal-content {
+    transform: translateY(0) scale(1);
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: #fff;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.close-btn:hover {
+    background: #ff4757;
+    transform: rotate(90deg);
+}
+
+/* =========================================
+   4. FORMULARZ W MODALU I POLA INPUT
+   ========================================= */
+.support-box h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: 900;
+}
+
+.support-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.support-form input, 
+.support-form textarea {
+    background: #000;
+    border: 1px solid #222;
+    padding: 15px;
+    color: #fff;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    transition: 0.3s;
+}
+
+.support-form input:focus, 
+.support-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.1);
+}
+
+/* =========================================
+   5. SEKCJA DOLNA (Napisz do nas)
+   ========================================= */
+.faq-support {
+    margin-top: 60px;
+    text-align: center;
+}
+
+.faq-support p {
+    color: var(--soft-green);
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+/* =========================================
+   6. ZMODYFIKOWANE PRZYCISKI (KLUCZOWE ZMIANY)
+   ========================================= */
+
+/* Wspólny styl dla obu przycisków (na stronie i w modalu) */
+#open-modal.btn-main,
+.support-form .btn-main {
+    /* Reset starych stylów */
+    background: transparent;
+    color: var(--primary-green);
+    
+    /* Neonowa ramka */
+    border: 2px solid var(--primary-green);
+    border-radius: 30px; /* Zaokrąglony kształt 'pigułki' */
+    
+    /* Czcionka i tekst */
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    
+    /* Wymiary i odstępy */
+    display: block;
+    width: 100%; /* Rozciągnij na pełną szerokość kontenera */
+    max-width: 300px; /* Ograniczenie szerokości */
+    margin: 20px auto 0; /* Wyśrodkowanie na dole strony */
+    padding: 16px 30px;
+    
+    /* Animacje i blask */
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.1);
+}
+
+/* Korekta dla przycisku wewnątrz formularza modala */
+.support-form .btn-main {
+    margin-top: 10px; /* Większy odstęp w formularzu */
+    max-width: 100%; /* W modalu na pełną szerokość */
+}
+
+/* EFEKT PO NAJECHANIU MYSZKĄ (Hover) */
+#open-modal.btn-main:hover,
+.support-form .btn-main:hover {
+    /* Pełne zielone tło i czarny tekst */
+    background: var(--primary-green);
+    color: #000;
+    
+    /* Efekt uniesienia i mocniejszy neonowy blask */
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.5), 
+                0 0 40px rgba(46, 204, 113, 0.3);
+}
+
+/* EFEKT PO KLIKNIĘCIU (Active) */
+#open-modal.btn-main:active,
+.support-form .btn-main:active {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+}
+
+/* =========================================
+   7. STOPKA I RESP_MEDIA
+   ========================================= */
+.main-footer {
+    margin-top: auto;
+    padding: 40px;
+    opacity: 0.4;
+    font-size: 0.85rem;
+}

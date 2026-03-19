@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centrum Meczowe | Common Ground</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="index.css"> 
+    <link rel="stylesheet" href="matches.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <img src="logoliga.jpg" alt="Logo CGL" class="nav-logo">
+        <ul class="nav-links">
+            <li><a href="index.html">Start</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="teams.html">Drużyny</a></li>
+            <li><a href="my-team.html" class="active" style="color: var(--primary-green);">Mój zespół</a></li>
+            <li id="user-display"></li>
+        </ul>
+    </nav>
+
+    <main class="matches-container">
+        <header class="matches-header">
+            <h3 class="status-label">PROTOKOŁY MECZOWE <span class="dot-live"></span></h3>
+            <h1>CENTRUM <span>MECZOWE</span></h1>
+            <p>Lista nadchodzących starć Twojej drużyny w bieżącym sezonie.</p>
+        </header>
+
+        <div id="matches-grid" class="matches-grid">
+            <p class="loading-msg">Łączenie z systemem meczowym...</p>
+        </div>
+    </main>
+
+    <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVAWDSMcgAhBZPiDurzNJtCju7HsfuFKgxduVMbjMYT25PG6a1IZ8QVOfqaryiGR4K/exec';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = JSON.parse(localStorage.getItem('cgl_user'));
+            const steam = localStorage.getItem('cgl_steam_link');
+
+            if (user) {
+                const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                document.getElementById('user-display').innerHTML = `
+                    <div class="user-pill" onclick="window.location.href='dashboard.html'">
+                        <img src="${avatarUrl}" class="user-avatar-pill">
+                        <span class="user-nick-pill">${user.username}</span>
+                    </div>`;
+            }
+
+            if (!user || !steam) {
+                document.getElementById('matches-grid').innerHTML = '<p class="muted">Musisz być zalogowany, aby zobaczyć mecze.</p>';
+                return;
+            }
+
+            try {
+                const resTeam = await fetch(`${APPS_SCRIPT_URL}?discordId=${user.id}&searchUser=${encodeURIComponent(steam)}`);
+                const teamData = await resTeam.json();
+
+                if (teamData.found) {
+                    loadMatches(teamData.teamName);
+                } else {
+                    document.getElementById('matches-grid').innerHTML = '<p class="muted">Nie należysz jeszcze do żadnej drużyny.</p>';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        async function loadMatches(teamName) {
+            try {
+                const res = await fetch(`${APPS_SCRIPT_URL}?action=getMatches`);
+                const matches = await res.json();
+                const myMatches = matches.filter(m => m.teamA === teamName || m.teamB === teamName);
+                const grid = document.getElementById('matches-grid');
+
+                if (myMatches.length === 0) {
+                    grid.innerHTML = '<p class="muted">Brak aktywnych meczów dla Twojego zespołu.</p>';
+                    return;
+                }
+
+                grid.innerHTML = myMatches.map(m => {
+                    const opponent = m.teamA === teamName ? m.teamB : m.teamA;
+                    const isConfirmed = m.status !== "Oczekuje na termin";
+                    // POPRAWKA: match-room.html zamiast match.html
+                    const matchUrl = `match-room.html?id=${m.id}`;
+
+                    return `
+                        <div class="match-panel-card">
+                            <div class="panel-top">
+                                <span class="m-type">MECZ LIGOWY</span>
+                                <span class="m-status-pill ${isConfirmed ? 'p-ready' : 'p-wait'}">${m.status.toUpperCase()}</span>
+                            </div>
+                            <div class="m-vs-area">
+                                <div class="m-team-name">vs <strong>${opponent}</strong></div>
+                                <div class="m-date-info">${m.date || 'TBD'} ${m.time ? '• ' + m.time : ''}</div>
+                            </div>
+                            <a href="${matchUrl}" class="btn-match-action">WEJDŹ DO POKOJU</a>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                document.getElementById('matches-grid').innerHTML = '<p class="muted">Błąd podczas pobierania meczów.</p>';
+            }
+        }
+    </script>
+</body>
+</html>

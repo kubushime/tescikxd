@@ -1,0 +1,197 @@
+/* --- GŁÓWNE USTAWIENIA STRONY --- */
+.teams-container {
+    max-width: 1200px;
+    margin: 100px auto 50px auto;
+    padding: 0 20px;
+    min-height: 80vh;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-header h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 10px 0;
+    letter-spacing: -1px;
+}
+
+.section-header h1 span {
+    color: #00ff88; /* Główny kolor ligi */
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.section-header p {
+    color: #888;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* --- SIATKA DRUŻYN (GRID) --- */
+.teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+/* --- KARTA DRUŻYNY --- */
+.team-card {
+    background: linear-gradient(145deg, #1a1a1a 0%, #111 100%);
+    border: 1px solid #333;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+}
+
+.team-card:hover {
+    transform: translateY(-10px);
+    border-color: #00ff88;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+/* --- STATUS BADGE --- */
+.team-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 5px 12px;
+    border-radius: 50px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.status-verified {
+    background: rgba(0, 255, 136, 0.1);
+    color: #00ff88;
+    border: 1px solid #00ff88;
+}
+
+.status-pending {
+    background: rgba(255, 204, 0, 0.1);
+    color: #ffcc00;
+    border: 1px solid #ffcc00;
+}
+
+/* --- LOGO --- */
+.team-logo-box {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 25px auto;
+    background: #0a0a0a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #222;
+    padding: 15px;
+    transition: transform 0.3s ease;
+}
+
+.team-card:hover .team-logo-box {
+    transform: scale(1.1);
+    border-color: #00ff88;
+}
+
+.team-logo-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+}
+
+/* --- INFO O DRUŻYNIE --- */
+.team-details h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+.team-details .tag {
+    display: block;
+    color: #00ff88;
+    font-size: 0.9rem;
+    font-weight: 400;
+    margin-top: 5px;
+}
+
+.team-meta {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #222;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.team-meta strong {
+    color: #bbb;
+    font-weight: 600;
+}
+
+/* --- LOADING & ERRORS --- */
+.loader, .empty-msg, .error-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 100px 20px;
+    font-size: 1.2rem;
+    color: #555;
+    background: rgba(255,255,255,0.02);
+    border-radius: 20px;
+    border: 2px dashed #222;
+}
+
+.error-msg {
+    color: #ff4757;
+    border-color: #ff475733;
+}
+
+/* --- USER PILL W NAVBARZE --- */
+.user-pill {
+    background: #111;
+    border: 1px solid #333;
+    padding: 5px 15px 5px 5px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+}
+
+.user-pill:hover {
+    border-color: #00ff88;
+    background: #000;
+}
+
+.user-nav-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #00ff88;
+}
+
+.user-nav-nick {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* --- RESPONSYWNOŚĆ --- */
+@media (max-width: 768px) {
+    .section-header h1 {
+        font-size: 2.2rem;
+    }
+    
+    .teams-grid {
+        grid-template-columns: 1fr;
+    }
+}

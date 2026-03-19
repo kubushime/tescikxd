@@ -1,0 +1,128 @@
+/* --- WYRÓWNANIE I STYL PIGUŁKI --- */
+.user-pill {
+    display: flex; 
+    align-items: center; 
+    background: rgba(0, 255, 136, 0.05); 
+    border: 1px solid #00ff88; 
+    padding: 5px 15px; 
+    border-radius: 50px; 
+    cursor: pointer;
+}
+.user-avatar-pill { width: 25px; border-radius: 50%; margin-right: 10px; }
+.user-nick-pill { font-weight: bold; color: white; font-size: 14px; }
+
+/* --- PRZYCISKI CTA (NAPRAWA SKAKANIA) --- */
+.cta-buttons {
+    display: flex;
+    gap: 20px;            /* Stały odstęp między wszystkimi przyciskami */
+    justify-content: center;
+    flex-wrap: wrap;      /* Zapobiega ściskaniu się 3 przycisków */
+    margin-top: 30px;
+}
+
+.btn-main, .btn-secondary {
+    margin: 0 !important; /* Resetujemy marginesy, gap załatwi sprawę */
+    min-width: 180px;     /* Wyrównuje szerokość przycisków */
+    text-align: center;
+}
+
+/* --- SEKCJA MECZÓW --- */
+.matches-section {
+    padding: 100px 20px;
+    background: var(--bg-dark);
+    display: flex;
+    justify-content: center;
+    scroll-behavior: smooth;
+}
+
+.container-matches {
+    max-width: 1100px;
+    width: 100%;
+}
+
+.panel-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--primary-green);
+    font-weight: 900;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dot-live {
+    width: 8px; height: 8px; background: #ff4757; border-radius: 50%;
+    box-shadow: 0 0 10px #ff4757; animation: blink 1.5s infinite;
+}
+
+/* --- GRID PANELI --- */
+.matches-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+.match-panel-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 30px;
+    border-radius: 15px;
+    transition: 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px;
+}
+
+.match-panel-card:hover {
+    border-color: var(--primary-green);
+    background: rgba(0, 255, 136, 0.02);
+    transform: translateY(-5px);
+}
+
+.match-header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.m-type { font-size: 9px; color: #444; font-weight: 900; letter-spacing: 1px; }
+.m-status-pill { font-size: 8px; padding: 3px 8px; border-radius: 4px; font-weight: 900; }
+.p-wait { background: #ffcc00; color: #000; }
+.p-ready { background: var(--primary-green); color: #000; }
+
+.m-vs-area { margin-bottom: 30px; }
+.m-team-name { font-size: 1.6rem; color: #fff; text-transform: uppercase; margin-bottom: 5px; }
+.m-team-name strong { color: var(--primary-green); }
+.m-date-info { font-size: 0.8rem; color: #666; font-weight: bold; }
+
+.btn-match-action {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid #222;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 900;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.btn-match-action:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+}
+
+.muted { color: #222; font-weight: 900; text-align: center; grid-column: 1/-1; padding: 50px; }
+
+@keyframes blink { 50% { opacity: 0.3; } }
+
+/* Płynne przewijanie do sekcji meczów */
+html {
+    scroll-behavior: smooth;
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regulamin | Common Ground</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="rules.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+   <nav class="navbar">
+        <img src="logoliga.jpg" alt="Logo CGL" class="nav-logo">
+        <ul class="nav-links">
+            <li><a href="index.html">Start</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="teams2.html">Drużyny</a></li>
+            <li><a href="my-team.html">Mój zespół</a></li>
+            <li id="user-auth"><a href="login.html" class="nav-btn login-special">Zaloguj się</a></li>
+        </ul>
+    </nav>
+
+    <main class="rules-container">
+        <header class="rules-header">
+            <h1>Zasady Gry</h1>
+            <p>Krótko, po ludzku i bez zbędnego lania wody. Gramy na Common Ground.</p>
+        </header>
+
+        <section class="rules-grid">
+            <div class="rule-card">
+                <span class="rule-number">01</span>
+                <h3>Szanujemy się</h3>
+                <p>Nie musisz nikogo lubić, ale zachowajmy resztki kultury. Wiadomo, to CS, więc nie będzie zbyt dużej napinki o to, ale szacunek musi być.</p>
+            </div>
+
+            <div class="rule-card">
+                <span class="rule-number">02</span>
+                <h3>Gramy czysto</h3>
+                <p>W skrócie: <strong>HAKS = Ban dla całej drużyny</strong> (do końca sezonu) + osoba oszukująca otrzymuje dożywotniego bana. U nas nie ma miejsca dla cziterów.</p>
+            </div>
+
+            <div class="rule-card">
+                <span class="rule-number">03</span>
+                <h3>Pilnujemy czasu</h3>
+                <p>Szanuj czas innych. Umawiacie się na mecz? Bądźcie całą piątką. 15 minut spóźnienia to walkower, chyba że dogadacie się z drugą ekipą, że chwilę poczekają.</p>
+            </div>
+
+            <div class="rule-card">
+                <span class="rule-number">04</span>
+                <h3>Kapitan to ogarnia</h3>
+                <p>Żeby nie było zamieszania: kapitan drużyny gada z sędziami i ustala terminy meczów. Jeden głos decyzyjny, zero chaosu.</p>
+            </div>
+
+            <div class="rule-card">
+                <span class="rule-number">05</span>
+                <h3>Sędzia ma ostatnie słowo</h3>
+                <p>Decyzja sędziego kończy dyskusję. Są tu po to, żeby liga działała sprawnie i sprawiedliwie.</p>
+            </div>
+        </section>
+
+        <footer class="rules-footer">
+            <p>Wszystko jasne? To zapraszamy do gry!</p>
+            <a href="index.html" class="btn-back">← Wróć do bazy</a>
+        </footer>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Common Ground</h4>
+                <p>Chcemy być największą amatorską lub i nie ligą w Polsce</p>
+            </div>
+            <div class="footer-section">
+                <h4>Społeczność</h4>
+                <div class="social-icons">
+                    <a href="https://discord.gg/bw7rSeSnJS" class="social-btn discord-footer">DISCORD</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Common Ground League. Wszystkie prawa zastrzeżone.
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const user = JSON.parse(localStorage.getItem('cgl_user'));
+        const authContainer = document.getElementById('user-auth');
+
+        if (user && authContainer) {
+            // Generowanie URL avatara z obsługą braku obrazka
+            const avatarUrl = user.avatar 
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                : 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+            authContainer.innerHTML = `
+                <div class="user-pill" onclick="window.location.href='dashboard.html'" style="cursor:pointer">
+                    <img src="${avatarUrl}" class="user-avatar" style="width:30px; border-radius:50%; margin-right:10px;">
+                    <span class="user-nick" style="font-weight:bold">${user.username}</span>
+                </div>
+            `;
+        }
+    });
+    </script>
+</body>
+</html>

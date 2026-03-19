@@ -1,0 +1,349 @@
+/* --- RESET I ZMIENNE --- */
+:root {
+    --primary-green: #00ff88;
+    --primary-hover: #00cc6e;
+    --accent-red: #ff4757;
+    --bg-dark: #0a0a0a;
+    --card-bg: #111;
+    --card-hover: #161616;
+    --border-color: #222;
+    --text-main: #ffffff;
+    --text-dim: #888;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+/* --- UKŁAD GŁÓWNY --- */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR (MENU BOCZNE) --- */
+.admin-sidebar {
+    width: 280px;
+    background: var(--card-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 40px 20px;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+
+.admin-logo {
+    width: 120px;
+    border-radius: 12px;
+    margin: 0 auto 40px auto;
+    border: 2px solid #333;
+}
+
+.admin-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-sidebar button {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-dim);
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-sidebar button:hover {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.admin-sidebar button.active {
+    background: rgba(0, 255, 136, 0.1);
+    color: var(--primary-green);
+    border-color: rgba(0, 255, 136, 0.3);
+}
+
+.back-link {
+    margin-top: auto;
+    text-decoration: none;
+    color: #444;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 10px;
+    transition: color 0.3s;
+}
+
+.back-link:hover {
+    color: var(--accent-red);
+}
+
+/* --- KONTENT GŁÓWNY --- */
+.admin-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 60px;
+}
+
+.admin-content header {
+    margin-bottom: 50px;
+}
+
+.admin-content h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.admin-content h1 span {
+    color: var(--primary-green);
+}
+
+/* STATUS POŁĄCZENIA */
+#admin-status {
+    color: var(--primary-green);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#admin-status::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--primary-green);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--primary-green);
+}
+
+/* --- SEKCJE I KARTY --- */
+.admin-section {
+    margin-bottom: 40px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.admin-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+}
+
+.admin-card h2, .admin-card h3 {
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+/* --- GENERATOR I PRZYCISKI GŁÓWNE --- */
+.admin-btns-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-main {
+    background: linear-gradient(45deg, var(--primary-green), #00cc6e);
+    color: #000;
+    padding: 15px 30px;
+    font-weight: 900;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+    transition: 0.3s;
+}
+
+.btn-main:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-outline:hover {
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+}
+
+.btn-refresh {
+    background: #222;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* --- KREATOR MECZÓW --- */
+.match-creator {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(0,0,0,0.2);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.admin-select {
+    flex: 1;
+    padding: 12px;
+    background: #000;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 8px;
+    outline: none;
+}
+
+.admin-select:focus {
+    border-color: var(--primary-green);
+}
+
+.vs-text {
+    font-weight: 900;
+    color: var(--primary-green);
+    font-size: 1.2rem;
+}
+
+/* --- LISTY ELEMENTÓW (DRUŻYNY/MECZE) --- */
+.admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.admin-item {
+    background: var(--card-hover);
+    border: 1px solid var(--border-color);
+    padding: 20px 25px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.admin-item:hover {
+    border-color: #444;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-info strong {
+    font-size: 1.1rem;
+    color: #fff;
+}
+
+.tag {
+    font-size: 0.7rem;
+    color: var(--primary-green);
+    border: 1px solid var(--primary-green);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 10px;
+    font-weight: 800;
+}
+
+.item-info span {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+/* --- AKCJE --- */
+.item-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-approve {
+    background: var(--primary-green);
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.btn-reject {
+    background: transparent;
+    color: var(--accent-red);
+    border: 1px solid var(--accent-red);
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-reject:hover {
+    background: var(--accent-red);
+    color: #fff;
+}
+
+/* --- MODALE I SWAL --- */
+.swal2-popup {
+    background: #111 !important;
+    color: #fff !important;
+    border-radius: 20px !important;
+    border: 1px solid var(--primary-green) !important;
+}
+
+/* --- RESPONSYWNOŚĆ --- */
+@media (max-width: 1024px) {
+    .admin-sidebar {
+        width: 80px;
+    }
+    .admin-sidebar button span, .admin-sidebar button i {
+        display: none;
+    }
+    .admin-logo {
+        width: 50px;
+    }
+    .admin-content {
+        margin-left: 80px;
+        padding: 30px;
+    }
+    .match-creator {
+        flex-direction: column;
+    }
+}

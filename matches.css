@@ -1,0 +1,113 @@
+/* --- KONTENER GŁÓWNY --- */
+.matches-container {
+    max-width: 1200px;
+    margin: 140px auto 60px auto;
+    padding: 0 20px;
+}
+
+.matches-header {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.matches-header h1 {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    margin: 10px 0;
+}
+
+.status-label {
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--primary-green);
+    font-weight: 900;
+}
+
+.dot-live {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: #ff4757;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ff4757;
+    margin-left: 5px;
+    animation: blink 1.5s infinite;
+}
+
+/* --- GRID MECZÓW --- */
+.matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+}
+
+/* --- KARTA MECZU --- */
+.match-panel-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 40px;
+    border-radius: 20px;
+    transition: 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 250px;
+}
+
+.match-panel-card:hover {
+    border-color: var(--primary-green);
+    background: rgba(0, 255, 136, 0.02);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.panel-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.m-type { font-size: 9px; color: #444; font-weight: 900; letter-spacing: 1px; }
+.m-status-pill { font-size: 8px; padding: 4px 10px; border-radius: 4px; font-weight: 900; }
+.p-wait { background: #ffcc00; color: #000; }
+.p-ready { background: var(--primary-green); color: #000; }
+
+.m-vs-area { margin-bottom: 40px; }
+.m-team-name { font-size: 1.8rem; color: #fff; text-transform: uppercase; line-height: 1.1; }
+.m-team-name strong { color: var(--primary-green); }
+.m-date-info { font-size: 0.85rem; color: #666; font-weight: bold; margin-top: 10px; }
+
+.btn-match-action {
+    display: block;
+    text-align: center;
+    padding: 15px;
+    background: transparent;
+    border: 1px solid #222;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 900;
+    font-size: 0.8rem;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.btn-match-action:hover {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+}
+
+/* --- PIGUŁKA PROFILU --- */
+.user-pill {
+    display: flex; align-items: center; background: rgba(0, 255, 136, 0.05); 
+    border: 1px solid #00ff88; padding: 5px 15px; border-radius: 50px; cursor: pointer;
+}
+.user-avatar-pill { width: 25px; border-radius: 50%; margin-right: 10px; }
+.user-nick-pill { font-weight: bold; color: white; font-size: 14px; }
+
+.muted { grid-column: 1/-1; text-align: center; padding: 80px; color: #222; font-weight: 900; letter-spacing: 2px; }
+
+@keyframes blink { 50% { opacity: 0.3; } }
+@keyframes blink-green { 50% { opacity: 0.5; } }
