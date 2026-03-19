@@ -80,12 +80,29 @@
         if (!userData) { window.location.href = 'login.html'; return; }
         displayProfile(userData);
 
-        let savedSteam = localStorage.getItem('cgl_steam_link');
-        if (savedSteam) {
-            updateSteamUI(savedSteam);
-            await checkGlobalStatus(userData.id, savedSteam);
-        } else {
-            displayNoSteamUI();
+        // --- SYNCHRONIZACJA Z BAZĄ GOOGLE ---
+        try {
+            // Pytamy bazę, czy użytkownik ma już zapisany Steam
+            const res = await fetch(`${APPS_SCRIPT_URL}?action=getUserData&discordId=${userData.id}`);
+            const data = await res.json();
+            
+            if (data && data.steamLink) {
+                // Zapamiętujemy lokalnie i odświeżamy widok
+                localStorage.setItem('cgl_steam_link', data.steamLink);
+                updateSteamUI(data.steamLink);
+                await checkGlobalStatus(userData.id, data.steamLink);
+            } else {
+                // Jeśli nie ma w bazie, sprawdzamy czy jest chociaż w pamięci lokalnej
+                let localSteam = localStorage.getItem('cgl_steam_link');
+                if (localSteam) {
+                    updateSteamUI(localSteam);
+                    await checkGlobalStatus(userData.id, localSteam);
+                } else {
+                    displayNoSteamUI();
+                }
+            }
+        } catch (e) {
+            console.error("Błąd synchronizacji:", e);
         }
     });
 
@@ -165,9 +182,9 @@
         document.getElementById('steam-status-text').innerText = "Połączono";
         document.getElementById('steam-status-text').className = "status-text text-green";
         document.getElementById('steam-action-btn').innerText = "Zmień Link Steam";
+        document.getElementById('steam-action-btn').style.opacity = "0.7";
     }
 
-    // --- ŁADNIE WYSKAKUJĄCE OKNO STEAM (SWEETALERT2) ---
     function openSteamModal() {
         Swal.fire({
             title: 'POŁĄCZ KONTO STEAM',
@@ -225,7 +242,6 @@
 </script>
 
 <style>
-    /* Twoje style CSS */
     .my-team-box { background: rgba(255,255,255,0.02); padding: 25px; border-radius: 16px; border: 1px solid #222; transition: 0.3s; }
     .active-box { border-color: #00ff88; background: rgba(0, 255, 136, 0.02); }
     .team-title-db { color: #fff; font-size: 1.6rem; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
@@ -245,8 +261,6 @@
     .admin-nav-link { color: #ff4757 !important; font-weight: 900; border: 1px solid #ff4757; padding: 5px 12px; border-radius: 6px; }
     .user-pill { display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 20px; cursor: pointer; }
     .user-avatar { width: 25px; height: 25px; border-radius: 50%; margin-right: 10px; }
-    
-    /* Poprawka koloru dla SweetAlert Input */
     .swal-input-green { border: 1px solid #2ecc71 !important; color: #2ecc71 !important; background: #000 !important; }
 </style>
 </body>
