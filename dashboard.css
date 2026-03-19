@@ -309,3 +309,75 @@
     cursor: pointer;
     text-align: center;
 }
+/* --- DEDYKOWANE STYLE DLA KARTY POWIĄZAŃ --- */
+
+.xplay-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Kontener z danymi (szary box wewnątrz karty) */
+.account-details-box {
+    background: rgba(0, 0, 0, 0.3); /* Ciemniejsze tło dla kontrastu */
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 5px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    color: #777;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.detail-value {
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+/* Specjalny styl dla uciętego linku Steam */
+.truncate-link {
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--primary-green);
+    font-family: 'monospace'; /* Wygląda bardziej technicznie */
+}
+
+/* Napis statusu pod nagłówkiem */
+.status-text {
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.text-red { color: #ff4757; text-shadow: 0 0 10px rgba(255, 71, 87, 0.2); }
+.text-green { color: var(--primary-green); text-shadow: 0 0 10px var(--accent-glow); }
+
+/* Poprawka Twojego przycisku Steam dla pełnej spójności */
+.btn-steam {
+    margin-top: 10px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-steam:active {
+    transform: scale(0.98);
+}
